@@ -51,6 +51,12 @@ python3 serve.py        # 多线程 + no-store
 
 头像尺寸不用手调：`sprite-alignment.js` 的 `avatarFrames()` 按**正面姿态**归一化（`AVATAR_TARGET`，当前 0.50），12 个角色视觉大小自动一致。
 
+## 做一个你自己的
+
+页面底部三步闭环：**下载 Skill** → 用你自己的图片生成工具产出两张图 → **上传验证**。
+
+`skills/character-sprite-sheets/SKILL.md` 是自包含的：prompt 模板、两张图的网格定义、几何约束、自检清单。用户把它和角色参考图一起交给任意图片生成工具（额度和模型用自己的），产出的图直接在页面上传试玩。图片只在浏览器本地处理，不上传服务器。
+
 ## 目录
 
 ```
