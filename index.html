@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>小伴 · Buddy Lab</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f7f6f2;color:#252720;font-family:Arial,"PingFang SC",sans-serif}main{max-width:1080px;margin:auto;padding:42px 40px}header{display:flex;justify-content:space-between;align-items:center;font-size:13px}header b{font-size:20px;letter-spacing:-1px}.tag{border:1px solid #d8d9d0;border-radius:30px;padding:8px 12px;color:#6b7064}.intro{margin-top:76px}.eyebrow{font-size:11px;letter-spacing:3px;color:#7a806e}h1{font-size:44px;letter-spacing:-2px;font-weight:500;margin:15px 0;line-height:1.25}p{color:#767a70;line-height:1.8;font-size:15px}.playground{margin-top:34px;border:1px solid #dcded3;border-radius:26px;position:relative;min-height:370px;display:grid;place-items:center;background:radial-gradient(#d8dccf .7px,transparent .7px) 0 0/18px 18px;background-color:#eeefe7;overflow:hidden}.hint{position:absolute;top:24px;left:26px;font-size:11px;letter-spacing:1px;color:#808776}.status{position:absolute;bottom:22px;font:11px monospace;color:#7e8575}.mascot{border:0;background:none;cursor:pointer;width:230px;height:230px;padding:0;touch-action:manipulation;-webkit-tap-highlight-color:transparent}.mascot:focus-visible{outline:2px solid #789756;border-radius:50%}.mascot svg{width:100%;height:100%;overflow:visible}.head{transition:transform 110ms ease-out;transform-origin:150px 157px}.eyes{transform-origin:150px 153px}.mascot.boop{animation:boop .45s ease}.mascot.boop .eyes{transform:scaleY(.12)}.mascot.blink .eyes{transform:scaleY(.08)}.blush{opacity:.4}.mascot.boop .blush{opacity:1}@keyframes boop{35%{transform:scale(1.1,.88) rotate(-5deg)}70%{transform:scale(.97,1.04) rotate(3deg)}}.bottom{display:flex;justify-content:space-between;gap:22px;padding:22px 2px}.controls{display:flex;align-items:center;gap:10px}.controls span{font-size:12px;color:#7a806e;margin-right:8px}.swatch{width:24px;height:24px;border:3px solid #f7f6f2;border-radius:50%;outline:1px solid transparent;cursor:pointer}.swatch[aria-pressed=true]{outline-color:#7e8871}.description{font-size:12px;color:#7a806e}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:30px;border-top:1px solid #dedfd7;padding-top:27px}.cards small{color:#939b86;font:11px monospace}.cards h2{font-size:15px;font-weight:500}.cards p{font-size:12px;margin:0}.footer{margin-top:44px;font:10px monospace;color:#999f90;letter-spacing:1px}@media(max-width:600px){main{padding:26px 23px}.intro{margin-top:48px}h1{font-size:43px}.playground{min-height:340px}.bottom{flex-direction:column}.cards{gap:18px}.cards h2{font-size:13px}.tag{font-size:10px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+.mascot{position:relative;width:260px;height:260px;opacity:0;transition:opacity .18s ease}.mascot[data-ready]{opacity:1}.squash{display:block;position:relative;width:100%;height:100%;transform-origin:50% 93%}.sheet{transform-origin:0 0;position:absolute;inset:0;background-size:300% 300%;background-repeat:no-repeat;pointer-events:none}.direction-sheet{background-image:url('assets/legacy/directions.webp');background-position:50% 50%}.reaction-sheet{background-image:url('assets/legacy/reactions.webp');opacity:0}.controls button{border:1px solid #d3d8c7;background:#f7f6f2;border-radius:8px;padding:8px 14px;cursor:pointer;color:#536343}.controls button:focus-visible{outline:2px solid #536343}
+.controls button[aria-pressed="true"]{background:#536343;color:white}.controls{flex:1;flex-wrap:wrap;align-items:center}.avatar-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%}.avatar-link{display:block;line-height:0}.avatar-link:focus-visible{outline:2px solid #536343;outline-offset:3px}.avatar-tile{display:block;width:100%;aspect-ratio:1;background-color:transparent;background-repeat:no-repeat;background-size:500% 500%;background-position:50% 50%}.upload-panel{margin-top:32px;padding:22px;border:1px solid #d8d9d0;border-radius:18px;background:#eeefe7}.upload-panel h2{font-size:20px;margin:0}.upload-panel p{font-size:12px}.upload-panel a{color:#536343}#upload-form{display:flex;flex-wrap:wrap;gap:18px;align-items:end;margin-top:20px}#upload-form label{display:grid;gap:10px;font-size:13px;flex:1;min-width:210px}#upload-form input{width:100%;font-size:12px}#upload-submit{background:#536343;color:white;border:0;border-radius:9px;padding:12px 18px;cursor:pointer}#upload-submit:disabled{opacity:.5}.intro{margin-top:42px}</style>
+<main>
+<header><b>小伴 <span style="font-weight:normal;color:#a1a797">/</span> buddy lab</b><span class="tag">原生实现 · 零依赖</span></header>
+<!-- 暂时隐藏上传面板：需要时删掉 hidden 即可恢复 -->
+<section class="upload-panel" aria-labelledby="upload-title" hidden>
+<h2 id="upload-title">让你的角色住进页面</h2><p>用 Skill 生成两张图，再上传试玩。图片只在当前浏览器处理，刷新后恢复示例。</p>
+<a href="skills/character-sprite-sheets/SKILL.md" download="SKILL.md">下载生成 Skill ↓</a>
+<form id="upload-form"><label>① 方向图 · 5 × 5<input id="upload-directions" type="file" accept="image/png,image/webp" required></label><label>② 表情图 · 3 × 3<input id="upload-reactions" type="file" accept="image/png,image/webp" required></label><button id="upload-submit">生成试玩</button></form>
+<p id="upload-status" role="status">请选择透明 PNG / WebP，正方形，每张不超过 15 MB。白底图片请先抠图。</p></section><section class="intro"><div class="eyebrow">A LITTLE COMPANY, ON YOUR PAGE.</div><h1>让你的页面住进一个小伙伴。</h1><p>移动鼠标，它会好奇地看向你。<br>轻轻戳一下，看看它的反应。</p></section>
+<section class="playground"><div class="hint">INTERACTIVE PLAYGROUND</div>
+<button class="mascot" aria-label="戳一下小伴" title="戳一下我">
+<span class="squash"><span class="sheet direction-sheet"></span><span class="sheet reaction-sheet"></span></span></button><div class="status">· 正在等你靠近 ·</div></section>
+<div class="bottom"><div class="controls"><div class="avatar-grid" id="switcher" role="group" aria-label="选择角色"></div><!-- 暂时隐藏：9/25 格切换与「戳一下」测试按钮，需要时删掉 hidden --><button data-grid="3" aria-pressed="false" hidden>9 格</button><button data-grid="5" aria-pressed="true" hidden>25 格</button><button type="button" id="test-boop" hidden>戳一下</button></div><div class="description"><span id="frame-info" hidden>25 格 · 正面</span></div></div><section class="cards"><article><small>01 / FOLLOW</small><h2>跟着你的方向</h2><p>横向五档 × 纵向五档，逐级切换转头姿态。</p></article><article><small>02 / REACT</small><h2>回应每次触碰</h2><p>闭眼 → 爱心 / 闪光 / 开心，配合挤压回弹。</p></article><article><small>03 / MAKE IT YOURS</small><h2>完全属于你</h2><p>使用你提供的两张图，独立的原生交互代码。</p></article></section>
+<div class="footer">HTML + CSS + JAVASCRIPT · NO PACKAGES · NO API</div>
+</main>
+<script>
+// ES modules refuse to load from file://, which would leave the mascot a still
+// image with no explanation - say so instead.
+if (location.protocol === 'file:') addEventListener('DOMContentLoaded', () => {
+  document.querySelector('.status').textContent =
+    '· 请用本地服务打开 · 在此目录运行 python3 -m http.server 8793，再访问 http://127.0.0.1:8793';
+});
+else {
+  // A stamp that changes every load, so no edit is ever hidden by cache again.
+  const script = document.createElement('script');
+  script.type = 'module';
+  script.src = 'upload.js?v=' + Date.now();
+  document.head.appendChild(script);
+}
+</script>
+</html>

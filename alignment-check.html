@@ -1,0 +1,102 @@
+<!doctype html><meta charset="utf-8"><title>小伴 · 对齐检查</title>
+<style>
+body{font:13px/1.6 -apple-system,"PingFang SC",sans-serif;background:#f7f6f2;color:#333;margin:0;padding:24px 26px 40px}
+h1{font-size:19px;font-weight:600;margin:0 0 4px}
+p{margin:0 0 16px;color:#6b7064;font-size:12px}
+#report{font:11px/1.7 monospace;color:#4a5340;background:#eeefe7;border:1px solid #dcded3;border-radius:8px;padding:10px 12px;margin-bottom:18px;white-space:pre-wrap}
+.bar{display:flex;gap:8px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
+button{border:1px solid #d3d8c7;background:#f7f6f2;border-radius:8px;padding:7px 13px;cursor:pointer;color:#536343;font-size:12px}
+button[aria-pressed=true]{background:#536343;color:#fff}
+#grid{display:grid;grid-template-columns:repeat(6,150px);gap:14px}
+figure{margin:0}
+.tile{width:150px;height:150px;position:relative;background:#eeefe7;border-radius:6px;overflow:hidden}
+.sheet{position:absolute;inset:0;background-repeat:no-repeat;transform-origin:0 0}
+.line{position:absolute;left:0;width:100%;border-top:1px solid #df6857;pointer-events:none}
+.box{position:absolute;border:1px dashed #7b8ba6;pointer-events:none}
+figcaption{font:10px/1.8 monospace;color:#8b9084;padding-top:3px}
+</style>
+<h1>精灵图对齐检查</h1>
+<p>每格都用与页面完全相同的规则绘制：统一缩放、统一裁切框，锚点落在肩宽中心与脚底。红线是脚底基线，虚线框是这套素材共用的裁切范围。</p>
+<div class="bar">
+  <button data-sheet="directions25" aria-pressed="true">25 格朝向</button>
+  <button data-sheet="directions" aria-pressed="false">9 格朝向</button>
+  <button data-sheet="reactions" aria-pressed="false">9 格表情</button>
+  <button id="old" aria-pressed="false">对照：旧版（按格子直接切）</button>
+</div>
+<div id="report">测量中…</div>
+<div id="grid"></div>
+<script type="module">
+import { registerSprites, applyFrame } from './sprite-alignment.js';
+const files = { directions: 'assets/legacy/directions.webp', reactions: 'assets/legacy/reactions.webp', directions25: 'assets/legacy/directions-25.webp' };
+const data = await registerSprites(true);
+const grid = document.querySelector('#grid');
+let current = 'directions25', old = false;
+const mean = frames => frames.reduce((sum, f) => sum + f.shoulderWidth, 0) / frames.length;
+
+// The old rule, kept to show what went wrong: take the nominal cell, shift it,
+// and crop nothing above - so the row above shows through at the top.
+function drawOld(layer, frame, viewport) {
+  const size = frame.size;
+  const share = data.directions[0].zoom * mean(data.directions);
+  const scale = share * size / frame.shoulderWidth;
+  const zoom = viewport / size * scale;
+  const localX = frame.cx - frame.column * size, localY = frame.floor - frame.row * size;
+  layer.style.backgroundSize = `${frame.natural * zoom}px ${frame.natural * zoom}px`;
+  layer.style.backgroundPosition = `${-frame.column * size * zoom}px ${-frame.row * size * zoom}px`;
+  layer.style.transform = `translate(${(viewport / 2 - localX * zoom) / viewport * 100}%, ${(viewport * .93 - localY * zoom) / viewport * 100}%) scale(1)`;
+  layer.style.clipPath = 'none';
+}
+
+function render() {
+  const frames = data[current];
+  const first = frames[0];
+  const zoom = 260 * first.zoom;
+  document.querySelector('#report').textContent =
+    `${current}：留白 ${first.pad}px · 脚底以上留 ${first.above.toFixed(1)}px · 左右各留 ${first.half.toFixed(1)}px · 统一缩放 ${zoom.toFixed(4)}\n`
+    + `视口 260px 的统一裁切：inset(上 ${(260 * .93 - first.above * zoom).toFixed(2)}px, 右 ${(130 - first.half * zoom).toFixed(2)}px, `
+    + `下 ${(260 * .07 - first.pad * zoom).toFixed(2)}px, 左 ${(130 - first.half * zoom).toFixed(2)}px) —— 所有帧共用\n`
+    + (old ? '对照旧版：直接按格子切、顶部不裁，上方会露出上一行的轮廓（就是那条黑线）。'
+           : '当前是统一裁切后的结果，切换上面的按钮查看其它素材。');
+  grid.textContent = '';
+  for (const frame of frames) {
+    const figure = document.createElement('figure');
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    const sprite = document.createElement('div');
+    sprite.className = 'sheet';
+    sprite.style.backgroundImage = `url(${files[current]})`;
+    tile.append(sprite);
+    const viewport = 150;                      // same maths, smaller box
+    if (old) drawOld(sprite, frame, viewport); else applyFrame(sprite, frame, viewport);
+    const line = document.createElement('div');
+    line.className = 'line';
+    line.style.top = '93%';
+    tile.append(line);
+    if (!old) {
+      const crop = document.createElement('div');
+      crop.className = 'box';
+      const fit = viewport * frame.zoom;
+      crop.style.top = `${viewport * .93 - frame.above * fit}px`;
+      crop.style.bottom = `${viewport * .07 - frame.pad * fit}px`;
+      crop.style.left = `${viewport / 2 - frame.half * fit}px`;
+      crop.style.right = `${viewport / 2 - frame.half * fit}px`;
+      tile.append(crop);
+    }
+    const caption = document.createElement('figcaption');
+    caption.textContent = `第 ${frame.cell} 格 · 肩宽 ${frame.shoulderWidth}`;
+    figure.append(tile, caption);
+    grid.append(figure);
+  }
+}
+document.querySelectorAll('[data-sheet]').forEach(button => button.addEventListener('click', () => {
+  current = button.dataset.sheet;
+  document.querySelectorAll('[data-sheet]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
+  render();
+}));
+document.querySelector('#old').addEventListener('click', event => {
+  old = !old;
+  event.currentTarget.setAttribute('aria-pressed', String(old));
+  render();
+});
+render();
+</script>

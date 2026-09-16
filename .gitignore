@@ -1,0 +1,10 @@
+.DS_Store
+node_modules/
+__pycache__/
+_site/
+# PNG originals are kept locally as the source of truth; only the WebP atlases
+# under assets/characters and assets/legacy are served and committed.
+assets/originals/
+.env
+.env.*
+!.env.example
